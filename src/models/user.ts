@@ -4,4 +4,5 @@ export interface User {
   email: string;
   password: string;
   registerDate: Date;
+  verified: boolean;
 }
