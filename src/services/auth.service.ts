@@ -6,12 +6,13 @@ import { randomBytes } from 'crypto';
 import { pool } from '../config/db';
 import { User } from '../models/user';
 import { hashPassword } from '../utils/password';
-import { isValidEmail, isStrongPassword } from '../utils/validate';
+import { isValidUsername, isValidEmail, isStrongPassword } from '../utils/validate';
 import { sendVerificationEmail } from '../utils/email';
 import { createToken } from '../utils/token';
 
 
 export async function registerUser(username: string, email: string, password: string) {
+  if (!isValidUsername(username)) throw new Error('User name format invalid');
   if (!isValidEmail(email)) throw new Error('Mail format invalid');
   if (!isStrongPassword(password)) throw new Error('Weak password!');
 
@@ -44,6 +45,9 @@ export async function registerUser(username: string, email: string, password: st
 
 
 export async function loginUser(email: string, password: string) {
+
+  if (!isValidEmail(email)) throw new Error('Mail format invalid');
+
   const conn = await pool.getConnection();
 
   try {
@@ -82,7 +86,6 @@ export async function loginUser(email: string, password: string) {
       }
     };
 
-
   } finally {
     conn.release();
   }
@@ -94,7 +97,6 @@ export async function verifyEmailToken(token: string) {
   const conn = await pool.getConnection();
 
   try {
-
     const queryValidation = 'SELECT * FROM emailVerification WHERE token = ? AND expires_at > NOW()';
     const [rows] = await conn.query(queryValidation, [token]) as any[];
 
@@ -131,4 +133,17 @@ export async function reSendVerificationEmail(user: User) {
   } finally {
     conn.release();
   }
+}
+
+export async function deleteUserAccount(userId: number) {
+
+  const conn = await pool.getConnection();
+
+  try {
+    const deleteQuery = 'DELETE FROM users WHERE id = ?';
+    await conn.query(deleteQuery, [userId]);
+  } finally {
+    conn.release();
+  }
+
 }
