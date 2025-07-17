@@ -135,13 +135,22 @@ export async function reSendVerificationEmail(user: User) {
   }
 }
 
-export async function deleteUserAccount(userId: number) {
+export async function deleteUserAccount(email: string) {
 
   const conn = await pool.getConnection();
 
   try {
-    const deleteQuery = 'DELETE FROM users WHERE id = ?';
-    await conn.query(deleteQuery, [userId]);
+    const queryExists = 'SELECT id FROM users WHERE email = ?';
+    const [existing] = await conn.query(queryExists, [email]) as any[];
+
+    if (existing.length > 0) {
+      const userId = existing[0].userId;
+      const deleteQuery = 'DELETE FROM users WHERE id = ?';
+      await conn.query(deleteQuery, [userId]);
+    } else {
+      throw new Error('Email not found!');
+    }
+
   } finally {
     conn.release();
   }

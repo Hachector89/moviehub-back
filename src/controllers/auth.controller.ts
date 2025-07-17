@@ -36,15 +36,15 @@ export async function verifyEmail(req: Request, res: Response) {
 }
 
 export async function deleteAccount(req: Request, res: Response) {
-  const userId = req.user?.id;
+  const userEmail = req.user?.email;
 
-  if (!userId) {
+  if (!userEmail) {
     res.status(401).json({ error: 'Unauthorized: no user ID in token' });
 
   } else {
 
     try {
-      await deleteUserAccount(userId);
+      await deleteUserAccount(userEmail);
       res.status(200).json({ message: 'Account deleted successfully' });
     } catch (err: any) {
       console.error('Error deleting user:', err);
