@@ -2,10 +2,10 @@ import { Request, Response } from 'express';
 import { registerUser, loginUser, verifyEmailToken, deleteUserAccount } from '../services/auth.service';
 
 export async function register(req: Request, res: Response) {
-  const { username, email, password } = req.body;
+  const { username, email, password, token } = req.body;
 
   try {
-    await registerUser(username, email, password);
+    await registerUser(username, email, password, token);
     res.status(201).json({ message: 'User registered, please verify account on your mail.' });
   } catch (err: any) {
     res.status(400).json({ error: err.message });
@@ -13,10 +13,10 @@ export async function register(req: Request, res: Response) {
 }
 
 export async function login(req: Request, res: Response) {
-  const { email, password } = req.body;
+  const { email, password, token } = req.body;
 
   try {
-    const result = await loginUser(email, password);
+    const result = await loginUser(email, password, token);
     res.status(200).json(result);
   } catch (err: any) {
     res.status(401).json({ error: err.message });

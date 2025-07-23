@@ -1,5 +1,4 @@
 import { RowDataPacket } from 'mysql2/promise';
-import jwt from 'jsonwebtoken';
 import bcrypt = require("bcryptjs");
 import { randomBytes } from 'crypto';
 
@@ -9,12 +8,15 @@ import { hashPassword } from '../utils/password';
 import { isValidUsername, isValidEmail, isStrongPassword } from '../utils/validate';
 import { sendVerificationEmail } from '../utils/email';
 import { createToken } from '../utils/token';
+import { verifyRecaptchaToken } from './recaptcha.service';
 
 
-export async function registerUser(username: string, email: string, password: string) {
+export async function registerUser(username: string, email: string, password: string, token: string) {
   if (!isValidUsername(username)) throw new Error('User name format invalid');
   if (!isValidEmail(email)) throw new Error('Mail format invalid');
   if (!isStrongPassword(password)) throw new Error('Weak password!');
+
+  await verifyRecaptchaToken(token);
 
   const conn = await pool.getConnection();
 
@@ -44,9 +46,11 @@ export async function registerUser(username: string, email: string, password: st
 }
 
 
-export async function loginUser(email: string, password: string) {
+export async function loginUser(email: string, password: string, token: string) {
 
   if (!isValidEmail(email)) throw new Error('Mail format invalid');
+
+  await verifyRecaptchaToken(token);
 
   const conn = await pool.getConnection();
 
