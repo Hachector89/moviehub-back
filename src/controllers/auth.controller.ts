@@ -28,8 +28,8 @@ export async function verifyEmail(req: Request, res: Response) {
   if (!token) res.status(400).json({ error: 'Token is required' });
 
   try {
-    const result = await verifyEmailToken(token);
-    res.status(200).json({ message: 'Email verified successfully!', result });
+    await verifyEmailToken(token);
+    res.status(204); // or res.sendStatus(204), not sure, test pending
   } catch (err: any) {
     res.status(400).json({ error: err.message });
   }
