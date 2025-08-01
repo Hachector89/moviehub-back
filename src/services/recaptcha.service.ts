@@ -24,7 +24,6 @@ export async function verifyRecaptchaToken(token: string): Promise<void> {
         const { success, score, 'error-codes': errorCodes } = response.data;
 
         if (!success) {
-            console.error('reCAPTCHA failed:', errorCodes);
             throw new Error('Failed reCAPTCHA verification');
         }
 

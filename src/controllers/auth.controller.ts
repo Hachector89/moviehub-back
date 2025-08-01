@@ -16,8 +16,8 @@ export async function login(req: Request, res: Response) {
   const { email, password, token } = req.body;
 
   try {
-    const result = await loginUser(email, password, token);
-    res.status(200).json(result);
+    const data = await loginUser(email, password, token);
+    res.status(200).json(data);
   } catch (err: any) {
     res.status(401).json({ error: err.message });
   }
@@ -39,7 +39,7 @@ export async function deleteAccount(req: Request, res: Response) {
   const userEmail = req.user?.email;
 
   if (!userEmail) {
-    res.status(401).json({ error: 'Unauthorized: no user ID in token' });
+    res.status(401).json({ error: 'Unauthorized: no user email in token' });
 
   } else {
 
@@ -47,7 +47,6 @@ export async function deleteAccount(req: Request, res: Response) {
       await deleteUserAccount(userEmail);
       res.status(200).json({ message: 'Account deleted successfully' });
     } catch (err: any) {
-      console.error('Error deleting user:', err);
       res.status(500).json({ error: 'Failed to delete account' });
     }
   }
