@@ -29,7 +29,7 @@ export async function fetchPopularMovies(language: string = 'en-US', page: strin
     }
 }
 
-export async function fetchMovieDetails(movieId: string, language: string = 'en-US') {
+export async function fetchMovieDetailsSimple(movieId: string, language: string = 'en-US') {
     const url = `${TMDB_BASE_URL}/movie/${movieId}`;
 
     if (!TMDB_ACCESS_TOKEN) {
@@ -44,6 +44,32 @@ export async function fetchMovieDetails(movieId: string, language: string = 'en-
             },
             params: {
                 language
+            }
+        });
+
+        return response.data;
+
+    } catch (err: any) {
+        throw new Error(`TMDB API request failed: ${err.message}`);
+    }
+}
+
+export async function fetchMovieDetails(movieId: string, language: string = 'en-US') {
+    const url = `${TMDB_BASE_URL}/movie/${movieId}`;
+
+    if (!TMDB_ACCESS_TOKEN) {
+        throw new Error('TMDB API token is missing');
+    }
+
+    try {
+        const response = await axios.get(url, {
+            headers: {
+                accept: 'application/json',
+                Authorization: `Bearer ${TMDB_ACCESS_TOKEN}`
+            },
+            params: {
+                language,
+                append_to_response: 'credits,similar,recommendations,reviews'
             }
         });
 
